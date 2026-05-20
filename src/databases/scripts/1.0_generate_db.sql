@@ -1,20 +1,12 @@
-CREATE TABLE IF NOT EXISTS institutions (
-    id UUID DEFAULT gen_random_uuid() NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
-    updated_at TIMESTAMP WITHOUT TIME ZONE,
-    CONSTRAINT institutions_pkey PRIMARY KEY (id),
-    CONSTRAINT institutions_name_key UNIQUE (name)
-);
-
 CREATE TABLE IF NOT EXISTS profiles (
     id UUID DEFAULT gen_random_uuid() NOT NULL,
     name VARCHAR(50) NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
-    questions_create_limit INTEGER,
+    questions_create_limit INTEGER NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT profiles_pkey PRIMARY KEY (id),
-    CONSTRAINT profiles_name_key UNIQUE (name)
+    CONSTRAINT profiles_name_key UNIQUE (name),
+    CONSTRAINT profiles_questions_create_limit_check CHECK (questions_create_limit >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -31,7 +23,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS questions (
     id UUID DEFAULT gen_random_uuid() NOT NULL,
-    institution_id UUID NOT NULL,
     topic VARCHAR(100) NOT NULL,
     subtopic TEXT NOT NULL,
     subtopic_description TEXT NOT NULL,
@@ -53,17 +44,18 @@ CREATE TABLE IF NOT EXISTS questions (
     CONSTRAINT questions_pkey PRIMARY KEY (id),
     CONSTRAINT questions_correct_answer_check CHECK (
         correct_answer = ANY (ARRAY['A'::bpchar, 'B'::bpchar, 'C'::bpchar, 'D'::bpchar, 'E'::bpchar])
-    ),
-    CONSTRAINT questions_institution_id_fkey FOREIGN KEY (institution_id) REFERENCES institutions (id)
+    )
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions (
     id UUID DEFAULT gen_random_uuid() NOT NULL,
     user_id UUID NOT NULL,
+    profile_id UUID NOT NULL,
     stripe_subscription_id TEXT NOT NULL,
     status VARCHAR(30) NOT NULL,
     price_id TEXT NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+    questions_limit INTEGER NOT NULL,
     stripe_customer_id TEXT,
     current_period_end TIMESTAMP WITHOUT TIME ZONE,
     questions_generated_in_cycle INTEGER DEFAULT 0 NOT NULL,
@@ -81,20 +73,14 @@ CREATE TABLE IF NOT EXISTS subscriptions (
             ]::text[]
         )
     ),
+    CONSTRAINT subscriptions_questions_limit_check CHECK (questions_limit >= 0),
+    CONSTRAINT subscriptions_questions_generated_in_cycle_check CHECK (questions_generated_in_cycle >= 0),
+    CONSTRAINT subscriptions_questions_generated_within_limit_check CHECK (
+        questions_generated_in_cycle <= questions_limit
+    ),
+    CONSTRAINT subscriptions_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES profiles (id),
     CONSTRAINT subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT subscriptions_stripe_subscription_id_key UNIQUE (stripe_subscription_id)
-);
-
-CREATE TABLE IF NOT EXISTS users_institutions (
-    user_id UUID NOT NULL,
-    institution_id UUID NOT NULL,
-    profile_id UUID NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
-    updated_at TIMESTAMP WITHOUT TIME ZONE,
-    CONSTRAINT users_institutions_pkey PRIMARY KEY (user_id, institution_id),
-    CONSTRAINT users_institutions_institution_id_fkey FOREIGN KEY (institution_id) REFERENCES institutions (id),
-    CONSTRAINT users_institutions_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES profiles (id),
-    CONSTRAINT users_institutions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS favorite_questions (

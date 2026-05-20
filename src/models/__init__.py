@@ -1,0 +1,35 @@
+from src.models.models import (
+    Profiles,
+    Questions,
+    QuestionAnswers,
+    QuestionFeedbacks,
+    Subscriptions,
+    UserFeedback,
+    Users,
+)
+
+routes = [
+    {
+        "model_class": None,
+        "standard_schema": None,
+        "db_session": None,
+        "auth_callback": None,
+        "request_post_schema": None,
+        "request_update_schema": None,
+        "response_get_schema": None,
+        "response_get_by_id_schema": None,
+        "response_post_schema": None,
+        "response_delete_schema": None,
+        "response_patch_schema": None,
+        "enable_get": True,
+        "enable_get_by_id": True,
+        "enable_post": False,
+        "enable_delete": False,
+        "enable_patch": False,
+        "join_parameters": None,
+        "second_level_join_parameters": None,
+        "route_prefix": "/institutions",
+        "route_tags": ["Institutions"],
+        "dependencies": False,
+    },
+]
