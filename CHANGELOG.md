@@ -6,6 +6,7 @@
 - JWT and Fernet utils added
 - Email utils added
 - Created tables to manage cupons usage
+- Basic questions generation routes created
 
 ## v0.0.1
 
