@@ -1,6 +1,6 @@
 [project]
 name = "enem-questionary-api"
-version = "0.0.1"
+version = "0.1.0"
 description = ""
 authors = [
     {name = "Axios Software",email = "axios.amd@axios-software.com.br"}
