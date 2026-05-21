@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKeyConstraint,
     Integer,
+    Numeric,
     PrimaryKeyConstraint,
     String,
     Table,
@@ -97,14 +98,23 @@ class Questions(Base):
 
 class Users(Base):
     __tablename__ = "users"
-    __table_args__ = (PrimaryKeyConstraint("id", name="users_pkey"),)
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="users_pkey"),
+        UniqueConstraint("email_hash", name="users_email_hash_key"),
+        UniqueConstraint("cpf_hash", name="users_cpf_hash_key"),
+        UniqueConstraint("nickname_hash", name="users_nickname_hash_key"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
     name: Mapped[str] = mapped_column(Text, nullable=False)
     email: Mapped[str] = mapped_column(Text, nullable=False)
+    cpf: Mapped[str] = mapped_column(Text, nullable=False)
     nickname: Mapped[str] = mapped_column(Text, nullable=False)
+    email_hash: Mapped[str] = mapped_column(CHAR(64), nullable=False)
+    cpf_hash: Mapped[str] = mapped_column(CHAR(64), nullable=False)
+    nickname_hash: Mapped[str] = mapped_column(CHAR(64), nullable=False)
     password: Mapped[str] = mapped_column(Text, nullable=False)
     global_role: Mapped[str] = mapped_column(
         String(50), nullable=False, server_default=text("'User'::character varying")
@@ -123,8 +133,56 @@ class Users(Base):
     subscriptions: Mapped[list["Subscriptions"]] = relationship(
         "Subscriptions", back_populates="user"
     )
+    coupon_redemptions: Mapped[list["CouponRedemptions"]] = relationship(
+        "CouponRedemptions", back_populates="user"
+    )
     user_feedback: Mapped[list["UserFeedback"]] = relationship(
         "UserFeedback", back_populates="user"
+    )
+
+
+class Coupons(Base):
+    __tablename__ = "coupons"
+    __table_args__ = (
+        CheckConstraint(
+            "discount_type::text = ANY (ARRAY['percent'::character varying::text, 'fixed'::character varying::text])",
+            name="coupons_discount_type_check",
+        ),
+        CheckConstraint("discount_value > 0", name="coupons_discount_value_check"),
+        CheckConstraint(
+            "max_redemptions IS NULL OR max_redemptions >= 0",
+            name="coupons_max_redemptions_check",
+        ),
+        PrimaryKeyConstraint("id", name="coupons_pkey"),
+        UniqueConstraint("code", name="coupons_code_key"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    code: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    discount_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    discount_value: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    is_first_purchase_only: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("true")
+    )
+    max_redemptions: Mapped[Optional[int]] = mapped_column(Integer)
+    starts_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
+    ends_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, server_default=text("now()")
+    )
+    updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
+
+    coupon_redemptions: Mapped[list["CouponRedemptions"]] = relationship(
+        "CouponRedemptions", back_populates="coupon"
+    )
+    subscriptions: Mapped[list["Subscriptions"]] = relationship(
+        "Subscriptions", back_populates="applied_coupon"
     )
 
 
@@ -225,6 +283,11 @@ class Subscriptions(Base):
             ["profile_id"], ["profiles.id"], name="subscriptions_profile_id_fkey"
         ),
         ForeignKeyConstraint(
+            ["applied_coupon_id"],
+            ["coupons.id"],
+            name="subscriptions_applied_coupon_id_fkey",
+        ),
+        ForeignKeyConstraint(
             ["user_id"], ["users.id"], name="subscriptions_user_id_fkey"
         ),
         PrimaryKeyConstraint("id", name="subscriptions_pkey"),
@@ -238,6 +301,7 @@ class Subscriptions(Base):
     )
     user_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
     profile_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    applied_coupon_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
     stripe_subscription_id: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(30), nullable=False)
     price_id: Mapped[str] = mapped_column(Text, nullable=False)
@@ -255,10 +319,59 @@ class Subscriptions(Base):
     )
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
 
+    applied_coupon: Mapped[Optional["Coupons"]] = relationship(
+        "Coupons", back_populates="subscriptions"
+    )
     profile: Mapped["Profiles"] = relationship(
         "Profiles", back_populates="subscriptions"
     )
     user: Mapped["Users"] = relationship("Users", back_populates="subscriptions")
+    coupon_redemptions: Mapped[list["CouponRedemptions"]] = relationship(
+        "CouponRedemptions", back_populates="subscription"
+    )
+
+
+class CouponRedemptions(Base):
+    __tablename__ = "coupon_redemptions"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["coupon_id"], ["coupons.id"], name="coupon_redemptions_coupon_id_fkey"
+        ),
+        ForeignKeyConstraint(
+            ["subscription_id"],
+            ["subscriptions.id"],
+            name="coupon_redemptions_subscription_id_fkey",
+        ),
+        ForeignKeyConstraint(
+            ["user_id"], ["users.id"], name="coupon_redemptions_user_id_fkey"
+        ),
+        PrimaryKeyConstraint("id", name="coupon_redemptions_pkey"),
+        UniqueConstraint(
+            "coupon_id", "user_id", name="coupon_redemptions_coupon_user_key"
+        ),
+        UniqueConstraint(
+            "subscription_id", name="coupon_redemptions_subscription_id_key"
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    coupon_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    subscription_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
+    discount_amount: Mapped[Optional[float]] = mapped_column(Numeric(10, 2))
+    redeemed_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, server_default=text("now()")
+    )
+
+    coupon: Mapped["Coupons"] = relationship(
+        "Coupons", back_populates="coupon_redemptions"
+    )
+    subscription: Mapped[Optional["Subscriptions"]] = relationship(
+        "Subscriptions", back_populates="coupon_redemptions"
+    )
+    user: Mapped["Users"] = relationship("Users", back_populates="coupon_redemptions")
 
 
 class UserFeedback(Base):

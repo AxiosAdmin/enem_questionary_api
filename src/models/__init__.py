@@ -1,4 +1,6 @@
 from src.models.models import (
+    Coupons,
+    CouponRedemptions,
     Profiles,
     Questions,
     QuestionAnswers,

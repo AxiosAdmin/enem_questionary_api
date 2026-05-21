@@ -1,10 +1,12 @@
 -- Script para dropar as tabelas do banco de dados
 
-DROP TABLE IF EXISTS subscriptions;
-DROP TABLE IF EXISTS user_feedback;
-DROP TABLE IF EXISTS question_feedbacks;
-DROP TABLE IF EXISTS favorite_questions;
-DROP TABLE IF EXISTS question_answers;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS questions;
-DROP TABLE IF EXISTS profiles;
+DROP TABLE IF EXISTS coupon_redemptions CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
+DROP TABLE IF EXISTS coupons CASCADE;
+DROP TABLE IF EXISTS user_feedback CASCADE;
+DROP TABLE IF EXISTS question_feedbacks CASCADE;
+DROP TABLE IF EXISTS favorite_questions CASCADE;
+DROP TABLE IF EXISTS question_answers CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS questions CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
