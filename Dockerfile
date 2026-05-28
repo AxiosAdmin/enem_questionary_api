@@ -2,7 +2,7 @@ FROM python:3.13-slim AS builder
 
 RUN pip install --upgrade pip
 RUN pip install poetry
-RUN apt-get update && apt-get install -y git & rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 WORKDIR /usr/src/app
