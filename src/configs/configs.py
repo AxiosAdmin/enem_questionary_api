@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str | None = None
     SMTP_FROM_EMAIL: str
     SMTP_FROM_NAME: str
+
     S3_ENABLED: bool = False
     S3_BUCKET: str | None = None
     S3_REGION: str | None = None

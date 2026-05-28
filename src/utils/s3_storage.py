@@ -43,7 +43,7 @@ class S3Storage:
             aws_access_key_id=settings.S3_ACCESS_KEY_ID,
             aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
             region_name=settings.S3_REGION,
-            endpoint_url=settings.S3_ENDPOINT_URL,
+            endpoint_url=_normalize_optional_setting(settings.S3_ENDPOINT_URL),
         )
         client.put_object(
             Bucket=settings.S3_BUCKET,
@@ -62,12 +62,15 @@ class S3Storage:
     def build_public_url(object_key: str) -> str:
         encoded_key = quote(object_key)
 
-        if settings.S3_PUBLIC_BASE_URL:
-            return f"{settings.S3_PUBLIC_BASE_URL.rstrip('/')}/{encoded_key}"
+        public_base_url = _normalize_optional_setting(settings.S3_PUBLIC_BASE_URL)
+        endpoint_url = _normalize_optional_setting(settings.S3_ENDPOINT_URL)
 
-        if settings.S3_ENDPOINT_URL:
+        if public_base_url:
+            return f"{public_base_url.rstrip('/')}/{encoded_key}"
+
+        if endpoint_url:
             return (
-                f"{settings.S3_ENDPOINT_URL.rstrip('/')}/"
+                f"{endpoint_url.rstrip('/')}/"
                 f"{settings.S3_BUCKET}/{encoded_key}"
             )
 
@@ -78,3 +81,11 @@ class S3Storage:
             )
 
         return f"https://{settings.S3_BUCKET}.s3.amazonaws.com/{encoded_key}"
+
+
+def _normalize_optional_setting(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    normalized_value = value.strip()
+    return normalized_value or None

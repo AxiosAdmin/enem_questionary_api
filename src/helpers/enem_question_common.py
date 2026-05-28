@@ -133,6 +133,9 @@ Requisitos gerais de qualidade:
 - o enunciado deve fazer referencia explicita ao suporte complementar quando ele existir
 - se usar texto-base, prefira trechos curtos ou medios e, quando pertinente, use rotulos como Texto I e Texto II
 - se usar material visual, descreva-o com clareza por meio de alt_text e legenda coerente
+- imagem gerada e opcional, nunca obrigatoria
+- so use rendering_mode "generated_image" quando a resolucao realmente depender de um apoio visual que nao possa ser representado com a mesma fidelidade por texto, tabela, grafico ou diagrama estruturado
+- quando texto, tabela, grafico ou diagrama forem suficientes, prefira essas formas e nao gere imagem
 - como esta aplicacao nao fornece fonte externa real, nunca invente referencias, autores, orgaos, links ou creditos
 - quando houver campo source_label em material sintetico, use exatamente: "Texto elaborado para fins educacionais."
 
