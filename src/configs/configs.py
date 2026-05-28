@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     OPENAI_IMAGE_SIZE: str = "1024x1024"
     OPENAI_IMAGE_QUALITY: str = "low"
     OPENAI_IMAGE_OUTPUT_FORMAT: str = "png"
-    QUESTION_ASSETS_ENABLE_IMAGE_GENERATION: bool = False
+    QUESTION_ASSETS_ENABLE_IMAGE_GENERATION: bool
     FERNET_KEY: str
     JWT_SECRET_KEY: str
     ALGORITHM: str
