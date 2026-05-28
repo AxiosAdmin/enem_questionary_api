@@ -1,3 +1,5 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.schemas.ai_natural_sciences_schema import (
     GenerateNaturalSciencesQuestionRequest,
 )
@@ -12,5 +14,8 @@ class AINaturalSciencesController:
     @staticmethod
     async def generate_natural_sciences_question(
         request: GenerateNaturalSciencesQuestionRequest,
+        db: AsyncSession,
     ):
-        return AINaturalSciencesService.generate_natural_sciences_question(request.topic)
+        return await AINaturalSciencesService.generate_natural_sciences_question(
+            request.topic, db
+        )

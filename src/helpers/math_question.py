@@ -253,6 +253,17 @@ MATH_ADDITIONAL_GUIDELINES = [
     "Priorize porcentagem, razao e proporcao, regra de tres, interpretacao de graficos, estatistica, probabilidade, escalas e geometria aplicada.",
     "Evite algebra pesada, demonstracoes formais e calculos excessivamente longos sem ganho interpretativo.",
     "Nao gere questoes de troco direto, soma mecanica, multiplicacao trivial ou conta escolar sem interpretacao.",
+    "Em matematica no estilo ENEM, privilegie suportes como grafico, tabela, esquema, planta, mapa simples, infografico ou imagem funcional, em vez de longos textos literarios.",
+    "O desafio central deve estar na modelagem da situacao, na leitura dos dados e na tomada de decisao quantitativa.",
+    "Quando usar diagrama, prefira dados estruturados com medidas, rotulos e escala, para que a figura seja renderizada de forma deterministica no front.",
+    "Os distratores devem refletir erros comuns de unidade, escala, proporcionalidade, leitura de eixos, arredondamento ou interpretacao de percentuais.",
+]
+
+MATH_SUPPORT_MATERIAL_PRIORITIES = [
+    "grafico cartesiano, de barras ou de linhas com tendencia ou comparacao de cenarios",
+    "tabela de dados quantitativos, estatisticos, financeiros ou de medicao",
+    "esquema, planta, figura geometrica ou diagrama estruturado com escalas e medidas",
+    "infografico ou imagem funcional apenas quando a leitura espacial ou quantitativa for essencial",
 ]
 
 
@@ -279,4 +290,5 @@ def build_enem_math_question_prompt(
         evaluation_points=MATH_EVALUATION_POINTS,
         frequent_contexts=MATH_FREQUENT_CONTEXTS,
         additional_area_guidelines=MATH_ADDITIONAL_GUIDELINES,
+        support_material_priorities=MATH_SUPPORT_MATERIAL_PRIORITIES,
     )

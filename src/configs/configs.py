@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int
     OPENAI_API_KEY: str
+    OPENAI_TEXT_MODEL: str = "gpt-5.4-mini"
+    OPENAI_IMAGE_MODEL: str = "gpt-image-1"
+    OPENAI_IMAGE_SIZE: str = "1024x1024"
+    OPENAI_IMAGE_QUALITY: str = "low"
+    OPENAI_IMAGE_OUTPUT_FORMAT: str = "png"
+    QUESTION_ASSETS_ENABLE_IMAGE_GENERATION: bool = False
     FERNET_KEY: str
     JWT_SECRET_KEY: str
     ALGORITHM: str
@@ -45,6 +51,14 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str | None = None
     SMTP_FROM_EMAIL: str
     SMTP_FROM_NAME: str
+    S3_ENABLED: bool = False
+    S3_BUCKET: str | None = None
+    S3_REGION: str | None = None
+    S3_ENDPOINT_URL: str | None = None
+    S3_ACCESS_KEY_ID: str | None = None
+    S3_SECRET_ACCESS_KEY: str | None = None
+    S3_PUBLIC_BASE_URL: str | None = None
+    S3_KEY_PREFIX: str = "question-assets"
 
     FRONTEND_ORIGINS: list[str] = [
         "http://localhost:3000",

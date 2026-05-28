@@ -153,6 +153,17 @@ HUMAN_SCIENCES_ADDITIONAL_GUIDELINES = [
     "A questao deve privilegiar leitura critica de fontes, comparacao de perspectivas e interpretacao historico-geografica ou sociopolitica.",
     "Quando apropriado, use texto-base, mapa, dado social, documento, charge, noticia ou trecho analitico.",
     "Evite perguntas de pura memorizacao de datas, nomes ou definicoes descontextualizadas.",
+    "Siga o padrao comum do ENEM em Humanas: documento, mapa, grafico, texto interpretativo ou imagem historica/social como base, seguido de um comando curto e analitico.",
+    "O suporte deve funcionar como fonte historica, geografica, sociologica ou filosofica a ser interpretada criticamente, e nao apenas como ilustracao.",
+    "As alternativas devem separar leituras superficiais de leituras contextualizadas, especialmente em temas de cidadania, poder, territorio, trabalho, memoria e conflito.",
+    "Quando houver dados, mapas, diagramas ou imagens, explore relacoes entre escala, contexto, intencionalidade, processo historico e implicacoes sociopoliticas.",
+]
+
+HUMAN_SCIENCES_SUPPORT_MATERIAL_PRIORITIES = [
+    "fonte historica, documento adaptado, noticia, manifesto ou texto analitico curto",
+    "mapa, representacao cartografica, fluxograma territorial ou esquema socioespacial",
+    "grafico ou tabela com dados demograficos, economicos, sociais ou ambientais",
+    "charge, cartaz, fotografia historica ou imagem socialmente situada",
 ]
 
 
@@ -179,4 +190,5 @@ def build_enem_human_sciences_question_prompt(
         evaluation_points=HUMAN_SCIENCES_EVALUATION_POINTS,
         frequent_contexts=HUMAN_SCIENCES_FREQUENT_CONTEXTS,
         additional_area_guidelines=HUMAN_SCIENCES_ADDITIONAL_GUIDELINES,
+        support_material_priorities=HUMAN_SCIENCES_SUPPORT_MATERIAL_PRIORITIES,
     )

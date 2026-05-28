@@ -217,6 +217,17 @@ LANGUAGES_ADDITIONAL_GUIDELINES = [
     "Priorize leitura atenta, inferencia, analise de efeito de sentido e interpretacao de linguagem verbal e nao verbal.",
     "Quando apropriado, use texto-base, fragmento literario, propaganda, charge, campanha, postagem digital ou outro genero frequente no ENEM.",
     "Evite questoes de pura classificacao gramatical sem contexto e sem efeito interpretativo.",
+    "Siga o padrao frequente do ENEM em Linguagens: texto-base ou material multimodal primeiro, comando curto depois e alternativas com nuances de sentido, finalidade, ponto de vista ou efeito de linguagem.",
+    "Quando o tema pedir comparacao, priorize formato Texto I e Texto II, com relacao de contraste, complementacao, intertextualidade ou mudanca de perspectiva.",
+    "Imagens, cartazes, charges, obras de arte, fotografias e posts devem ser lidos como linguagem e nao como ilustracao decorativa.",
+    "Se usar lingua estrangeira, o foco deve estar na compreensao global, no uso social e nos efeitos de sentido, e nao na traducao palavra por palavra.",
+]
+
+LANGUAGES_SUPPORT_MATERIAL_PRIORITIES = [
+    "texto-base jornalistico, de divulgacao, opinativo ou institucional com fonte em estilo ENEM",
+    "par Texto I e Texto II para comparacao de perspectivas, generos ou efeitos de sentido",
+    "propaganda, campanha publica, tirinha, charge, cartum, meme ou postagem digital",
+    "fotografia, cartaz, obra de arte ou material visual quando houver leitura de linguagem verbal e nao verbal",
 ]
 
 
@@ -243,4 +254,5 @@ def build_enem_languages_question_prompt(
         evaluation_points=LANGUAGES_EVALUATION_POINTS,
         frequent_contexts=LANGUAGES_FREQUENT_CONTEXTS,
         additional_area_guidelines=LANGUAGES_ADDITIONAL_GUIDELINES,
+        support_material_priorities=LANGUAGES_SUPPORT_MATERIAL_PRIORITIES,
     )

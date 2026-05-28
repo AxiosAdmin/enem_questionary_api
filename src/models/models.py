@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKeyConstraint,
     Integer,
+    JSON,
     Numeric,
     PrimaryKeyConstraint,
     String,
@@ -93,6 +94,69 @@ class Questions(Base):
     )
     question_feedbacks: Mapped[list["QuestionFeedbacks"]] = relationship(
         "QuestionFeedbacks", back_populates="question"
+    )
+    question_assets: Mapped[list["QuestionAssets"]] = relationship(
+        "QuestionAssets",
+        back_populates="question",
+        cascade="all, delete-orphan",
+    )
+
+
+class QuestionAssets(Base):
+    __tablename__ = "question_assets"
+    __table_args__ = (
+        CheckConstraint(
+            "asset_type::text = ANY (ARRAY['text'::character varying::text, 'table'::character varying::text, 'chart'::character varying::text, 'image'::character varying::text, 'map'::character varying::text, 'diagram'::character varying::text, 'infographic'::character varying::text])",
+            name="question_assets_asset_type_check",
+        ),
+        CheckConstraint(
+            "rendering_mode::text = ANY (ARRAY['inline_text'::character varying::text, 'structured_data'::character varying::text, 'generated_image'::character varying::text])",
+            name="question_assets_rendering_mode_check",
+        ),
+        CheckConstraint(
+            "position::text = ANY (ARRAY['before_statement'::character varying::text, 'after_statement'::character varying::text])",
+            name="question_assets_position_check",
+        ),
+        CheckConstraint(
+            "storage_status::text = ANY (ARRAY['not_required'::character varying::text, 'pending_storage_configuration'::character varying::text, 'stored'::character varying::text, 'generation_failed'::character varying::text])",
+            name="question_assets_storage_status_check",
+        ),
+        ForeignKeyConstraint(
+            ["question_id"], ["questions.id"], name="question_assets_question_id_fkey"
+        ),
+        PrimaryKeyConstraint("id", name="question_assets_pkey"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    question_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    asset_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    rendering_mode: Mapped[str] = mapped_column(String(20), nullable=False)
+    position: Mapped[str] = mapped_column(String(30), nullable=False)
+    display_order: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default=text("0")
+    )
+    storage_status: Mapped[str] = mapped_column(
+        String(40), nullable=False, server_default=text("'not_required'")
+    )
+    title: Mapped[Optional[str]] = mapped_column(Text)
+    caption: Mapped[Optional[str]] = mapped_column(Text)
+    alt_text: Mapped[Optional[str]] = mapped_column(Text)
+    source_label: Mapped[Optional[str]] = mapped_column(Text)
+    content: Mapped[Optional[str]] = mapped_column(Text)
+    storage_provider: Mapped[Optional[str]] = mapped_column(String(30))
+    storage_key: Mapped[Optional[str]] = mapped_column(Text)
+    public_url: Mapped[Optional[str]] = mapped_column(Text)
+    mime_type: Mapped[Optional[str]] = mapped_column(String(100))
+    asset_metadata: Mapped[Optional[dict]] = mapped_column("metadata", JSON)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, server_default=text("now()")
+    )
+    updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
+
+    question: Mapped["Questions"] = relationship(
+        "Questions", back_populates="question_assets"
     )
 
 

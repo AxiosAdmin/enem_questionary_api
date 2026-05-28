@@ -142,6 +142,17 @@ NATURAL_SCIENCES_ADDITIONAL_GUIDELINES = [
     "A questao deve exigir interpretacao cientifica, e nao apenas lembranca isolada de definicoes.",
     "Quando apropriado, use experimentos, dados, fenomenos naturais, tecnologias e implicacoes sociais ou ambientais.",
     "Evite questoes puramente conteudistas, sem contexto, ou baseadas apenas em nomenclatura decorada.",
+    "Siga o padrao frequente do ENEM em Natureza: situacao-problema contextualizada, suporte experimental ou informacional e comando que exija explicacao cientifica aplicada.",
+    "Use graficos, tabelas, esquemas, diagramas estruturados, rotulos, relatorios de experimento, fotografias tecnicas ou infograficos quando eles forem essenciais para interpretar o fenomeno.",
+    "Os distratores devem refletir erros de causalidade, escala, leitura de experimento, unidade, mecanismo biologico, transformacao quimica ou comportamento fisico do sistema.",
+    "Sempre privilegie ciencia em contexto de saude, ambiente, tecnologia, energia, seguranca, consumo ou investigacao.",
+]
+
+NATURAL_SCIENCES_SUPPORT_MATERIAL_PRIORITIES = [
+    "trecho de experimento, divulgacao cientifica, relatorio tecnico ou texto de saude publica",
+    "grafico ou tabela com variaveis fisicas, quimicas, biologicas, epidemiologicas ou ambientais",
+    "diagrama, esquema de processo, circuito, cadeia ecologica, estrutura celular ou representacao laboratorial",
+    "fotografia tecnica, rotulo, embalagem, equipamento, ambiente natural ou infografico cientifico",
 ]
 
 
@@ -168,4 +179,5 @@ def build_enem_natural_sciences_question_prompt(
         evaluation_points=NATURAL_SCIENCES_EVALUATION_POINTS,
         frequent_contexts=NATURAL_SCIENCES_FREQUENT_CONTEXTS,
         additional_area_guidelines=NATURAL_SCIENCES_ADDITIONAL_GUIDELINES,
+        support_material_priorities=NATURAL_SCIENCES_SUPPORT_MATERIAL_PRIORITIES,
     )

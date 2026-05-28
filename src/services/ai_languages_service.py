@@ -1,3 +1,5 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.helpers.languages_question import (
     build_enem_languages_question_prompt,
     build_random_languages_question_context,
@@ -12,9 +14,10 @@ class AILanguagesService:
         return get_languages_topics()
 
     @staticmethod
-    def generate_languages_question(topic: str):
-        return generate_enem_question(
+    async def generate_languages_question(topic: str, db: AsyncSession):
+        return await generate_enem_question(
             topic,
             build_random_languages_question_context,
             build_enem_languages_question_prompt,
+            db,
         )

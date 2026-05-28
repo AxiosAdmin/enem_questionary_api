@@ -1,7 +1,7 @@
 import re
 import uuid
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, ConfigDict
 
 from src.utils.hash_utils import normalize_cpf, normalize_email, normalize_nickname
 
@@ -54,6 +54,14 @@ class CreateUserRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {"email": "email@email.com", "password": "12345678"}
+        },
+    )
+
     email: str
     password: str
 

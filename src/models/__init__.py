@@ -2,6 +2,7 @@ from src.models.models import (
     Coupons,
     CouponRedemptions,
     Profiles,
+    QuestionAssets,
     Questions,
     QuestionAnswers,
     QuestionFeedbacks,
