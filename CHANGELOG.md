@@ -1,3 +1,9 @@
+## v0.2.0
+
+- Implemented Charts, texts and images implementation to the questions generation
+- Added s3 to save images
+- Improvements to the prompt for questions generation
+
 ## v0.1.0
 
 - Login, Register and Forgot Password route created
