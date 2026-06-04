@@ -2,6 +2,7 @@ from src.helpers.enem_question_common import (
     build_enem_area_question_prompt,
     build_random_topic_context,
     get_catalog_topics,
+    get_catalog_topics_with_subtopics,
 )
 
 
@@ -233,6 +234,10 @@ LANGUAGES_SUPPORT_MATERIAL_PRIORITIES = [
 
 def get_languages_topics() -> list[str]:
     return get_catalog_topics(LANGUAGES_TOPIC_CATALOG)
+
+
+def get_languages_topics_with_subtopics() -> list[dict[str, object]]:
+    return get_catalog_topics_with_subtopics(LANGUAGES_TOPIC_CATALOG)
 
 
 def build_random_languages_question_context(topic: str) -> dict[str, str]:

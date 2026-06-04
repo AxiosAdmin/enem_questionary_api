@@ -3,6 +3,16 @@ from pydantic import BaseModel, field_validator
 from src.helpers.human_sciences_question import get_human_sciences_topics
 
 
+class HumanSciencesSubtopicResponse(BaseModel):
+    name: str
+    description: str
+
+
+class HumanSciencesTopicResponse(BaseModel):
+    topic: str
+    subtopics: list[HumanSciencesSubtopicResponse]
+
+
 class GenerateHumanSciencesQuestionRequest(BaseModel):
     topic: str
 
@@ -17,4 +27,4 @@ class GenerateHumanSciencesQuestionRequest(BaseModel):
 
 
 class HumanSciencesTopicsResponse(BaseModel):
-    topics: list[str]
+    topics: list[HumanSciencesTopicResponse]

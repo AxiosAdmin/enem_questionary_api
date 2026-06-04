@@ -3,6 +3,16 @@ from pydantic import BaseModel, field_validator
 from src.helpers.math_question import get_math_topics
 
 
+class MathSubtopicResponse(BaseModel):
+    name: str
+    description: str
+
+
+class MathTopicResponse(BaseModel):
+    topic: str
+    subtopics: list[MathSubtopicResponse]
+
+
 class GenerateMathQuestionRequest(BaseModel):
     topic: str
 
@@ -17,4 +27,4 @@ class GenerateMathQuestionRequest(BaseModel):
 
 
 class MathTopicsResponse(BaseModel):
-    data: list[str]
+    data: list[MathTopicResponse]

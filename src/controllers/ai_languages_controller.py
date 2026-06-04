@@ -7,7 +7,7 @@ from src.services.ai_languages_service import AILanguagesService
 class AILanguagesController:
     @staticmethod
     async def get_languages_topics():
-        return {"topics": AILanguagesService.get_languages_topics()}
+        return {"topics": AILanguagesService.get_languages_topics_with_subtopics()}
 
     @staticmethod
     async def generate_languages_question(

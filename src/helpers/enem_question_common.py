@@ -44,6 +44,22 @@ def get_catalog_topics(catalog: dict) -> list[str]:
     return list(catalog.keys())
 
 
+def get_catalog_topics_with_subtopics(catalog: dict) -> list[dict[str, object]]:
+    return [
+        {
+            "topic": topic,
+            "subtopics": [
+                {
+                    "name": subtopic["name"],
+                    "description": subtopic["description"],
+                }
+                for subtopic in configuration["subtopics"]
+            ],
+        }
+        for topic, configuration in catalog.items()
+    ]
+
+
 def get_topic_configuration(catalog: dict, topic: str) -> dict:
     if topic not in catalog:
         raise ValueError(f"Unsupported topic: {topic}")

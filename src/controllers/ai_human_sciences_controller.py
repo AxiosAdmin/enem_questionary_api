@@ -7,7 +7,9 @@ from src.services.ai_human_sciences_service import AIHumanSciencesService
 class AIHumanSciencesController:
     @staticmethod
     async def get_human_sciences_topics():
-        return {"topics": AIHumanSciencesService.get_human_sciences_topics()}
+        return {
+            "topics": AIHumanSciencesService.get_human_sciences_topics_with_subtopics()
+        }
 
     @staticmethod
     async def generate_human_sciences_question(

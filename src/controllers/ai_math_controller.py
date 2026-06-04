@@ -7,7 +7,7 @@ from src.services.ai_math_service import AIMathService
 class AIMathController:
     @staticmethod
     async def get_math_topics():
-        return {"data": AIMathService.get_math_topics()}
+        return {"data": AIMathService.get_math_topics_with_subtopics()}
 
     @staticmethod
     async def generate_math_question(

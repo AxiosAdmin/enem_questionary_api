@@ -3,6 +3,16 @@ from pydantic import BaseModel, field_validator
 from src.helpers.languages_question import get_languages_topics
 
 
+class LanguagesSubtopicResponse(BaseModel):
+    name: str
+    description: str
+
+
+class LanguagesTopicResponse(BaseModel):
+    topic: str
+    subtopics: list[LanguagesSubtopicResponse]
+
+
 class GenerateLanguagesQuestionRequest(BaseModel):
     topic: str
 
@@ -17,4 +27,4 @@ class GenerateLanguagesQuestionRequest(BaseModel):
 
 
 class LanguagesTopicsResponse(BaseModel):
-    topics: list[str]
+    topics: list[LanguagesTopicResponse]

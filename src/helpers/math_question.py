@@ -2,6 +2,7 @@ from src.helpers.enem_question_common import (
     build_enem_area_question_prompt,
     build_random_topic_context,
     get_catalog_topics,
+    get_catalog_topics_with_subtopics,
 )
 
 
@@ -269,6 +270,10 @@ MATH_SUPPORT_MATERIAL_PRIORITIES = [
 
 def get_math_topics() -> list[str]:
     return get_catalog_topics(MATH_TOPIC_CATALOG)
+
+
+def get_math_topics_with_subtopics() -> list[dict[str, object]]:
+    return get_catalog_topics_with_subtopics(MATH_TOPIC_CATALOG)
 
 
 def build_random_math_question_context(topic: str) -> dict[str, str]:

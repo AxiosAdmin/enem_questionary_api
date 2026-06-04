@@ -9,7 +9,11 @@ from src.services.ai_natural_sciences_service import AINaturalSciencesService
 class AINaturalSciencesController:
     @staticmethod
     async def get_natural_sciences_topics():
-        return {"topics": AINaturalSciencesService.get_natural_sciences_topics()}
+        return {
+            "topics": (
+                AINaturalSciencesService.get_natural_sciences_topics_with_subtopics()
+            )
+        }
 
     @staticmethod
     async def generate_natural_sciences_question(

@@ -3,6 +3,16 @@ from pydantic import BaseModel, field_validator
 from src.helpers.natural_sciences_question import get_natural_sciences_topics
 
 
+class NaturalSciencesSubtopicResponse(BaseModel):
+    name: str
+    description: str
+
+
+class NaturalSciencesTopicResponse(BaseModel):
+    topic: str
+    subtopics: list[NaturalSciencesSubtopicResponse]
+
+
 class GenerateNaturalSciencesQuestionRequest(BaseModel):
     topic: str
 
@@ -18,4 +28,4 @@ class GenerateNaturalSciencesQuestionRequest(BaseModel):
 
 
 class NaturalSciencesTopicsResponse(BaseModel):
-    topics: list[str]
+    topics: list[NaturalSciencesTopicResponse]
