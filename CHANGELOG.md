@@ -1,3 +1,7 @@
+## v0.3.0
+
+- Manual question creation added 
+
 ## v0.2.0
 
 - Implemented Charts, texts and images implementation to the questions generation
