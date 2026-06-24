@@ -1,6 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas.ai_math_schema import GenerateMathQuestionRequest
+from src.schemas.ai_math_schema import (
+    GenerateMathQuestionRequest,
+    GenerateMathQuestionWithSupportMaterialsRequest,
+)
 from src.services.ai_math_service import AIMathService
 
 
@@ -15,3 +18,14 @@ class AIMathController:
         db: AsyncSession,
     ):
         return await AIMathService.generate_math_question(request.topic, db)
+
+    @staticmethod
+    async def generate_math_question_with_support_materials(
+        request: GenerateMathQuestionWithSupportMaterialsRequest,
+        db: AsyncSession,
+    ):
+        return await AIMathService.generate_math_question_with_support_materials(
+            request.topic,
+            request.support_material_ids,
+            db,
+        )

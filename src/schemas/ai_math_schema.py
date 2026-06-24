@@ -1,4 +1,6 @@
-from pydantic import BaseModel, field_validator
+from uuid import UUID
+
+from pydantic import BaseModel, Field, field_validator
 
 from src.helpers.math_question import get_math_topics
 
@@ -24,6 +26,10 @@ class GenerateMathQuestionRequest(BaseModel):
                 f"Invalid topic. Supported topics are: {', '.join(get_math_topics())}"
             )
         return value
+
+
+class GenerateMathQuestionWithSupportMaterialsRequest(GenerateMathQuestionRequest):
+    support_material_ids: list[UUID] = Field(min_length=1)
 
 
 class MathTopicsResponse(BaseModel):

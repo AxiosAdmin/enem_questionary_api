@@ -56,7 +56,6 @@ CREATE TABLE IF NOT EXISTS questions (
 
 CREATE TABLE IF NOT EXISTS question_assets (
     id UUID DEFAULT gen_random_uuid() NOT NULL,
-    question_id UUID NOT NULL,
     asset_type VARCHAR(20) NOT NULL,
     rendering_mode VARCHAR(20) NOT NULL,
     position VARCHAR(30) NOT NULL,
@@ -75,7 +74,6 @@ CREATE TABLE IF NOT EXISTS question_assets (
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT question_assets_pkey PRIMARY KEY (id),
-    CONSTRAINT question_assets_question_id_fkey FOREIGN KEY (question_id) REFERENCES questions (id) ON DELETE CASCADE,
     CONSTRAINT question_assets_asset_type_check CHECK (
         asset_type IN ('text', 'table', 'chart', 'image', 'map', 'diagram', 'infographic')
     ),
@@ -88,6 +86,15 @@ CREATE TABLE IF NOT EXISTS question_assets (
     CONSTRAINT question_assets_storage_status_check CHECK (
         storage_status IN ('not_required', 'pending_storage_configuration', 'stored', 'generation_failed')
     )
+);
+
+CREATE TABLE IF NOT EXISTS question_asset_questions (
+    question_id UUID NOT NULL,
+    question_asset_id UUID NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+    CONSTRAINT question_asset_questions_pkey PRIMARY KEY (question_id, question_asset_id),
+    CONSTRAINT question_asset_questions_question_id_fkey FOREIGN KEY (question_id) REFERENCES questions (id) ON DELETE CASCADE,
+    CONSTRAINT question_asset_questions_question_asset_id_fkey FOREIGN KEY (question_asset_id) REFERENCES question_assets (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS coupons (

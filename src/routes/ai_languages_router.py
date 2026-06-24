@@ -6,6 +6,7 @@ from src.controllers.ai_languages_controller import AILanguagesController
 from src.schemas.ai_question_schema import GeneratedQuestionResponse
 from src.schemas.ai_languages_schema import (
     GenerateLanguagesQuestionRequest,
+    GenerateLanguagesQuestionWithSupportMaterialsRequest,
     LanguagesTopicsResponse,
 )
 
@@ -23,3 +24,16 @@ async def generate_languages_question(
     db: AsyncSession = Depends(get_db),
 ):
     return await AILanguagesController.generate_languages_question(request, db)
+
+
+@ai_languages_router.post(
+    "/languages/with-support-materials",
+    response_model=GeneratedQuestionResponse,
+)
+async def generate_languages_question_with_support_materials(
+    request: GenerateLanguagesQuestionWithSupportMaterialsRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    return await AILanguagesController.generate_languages_question_with_support_materials(
+        request, db
+    )

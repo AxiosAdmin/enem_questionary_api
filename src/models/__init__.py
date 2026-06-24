@@ -12,6 +12,10 @@ from src.models.models import (
     Users,
 )
 from src.schemas.ai_question_schema import GeneratedQuestionGeneric
+from src.schemas.question_asset_schema import (
+    CreateQuestionAssetRouteRequest,
+    QuestionAssetRouteResponse,
+)
 from src.configs.db_connection import get_db
 
 routes: list[dict[str, Any]] = [
@@ -27,15 +31,38 @@ routes: list[dict[str, Any]] = [
         "response_post_schema": None,
         "response_delete_schema": None,
         "response_patch_schema": None,
-        "use_get": False,
+        "use_get": True,
         "use_get_by_id": False,
-        "use_post": True,
+        "use_post": False,
         "use_delete": False,
         "use_patch": False,
         "join_parameters": None,
         "second_level_join_parameters": None,
         "route_prefix": "/questions",
         "route_tags": ["Questions"],
+        "dependencies": True,
+    },
+    {
+        "model_class": QuestionAssets,
+        "standard_schema": QuestionAssetRouteResponse,
+        "db_session": get_db,
+        "auth_callback": None,
+        "request_post_schema": CreateQuestionAssetRouteRequest,
+        "request_patch_schema": None,
+        "response_get_schema": QuestionAssetRouteResponse,
+        "response_get_by_id_schema": QuestionAssetRouteResponse,
+        "response_post_schema": QuestionAssetRouteResponse,
+        "response_delete_schema": None,
+        "response_patch_schema": None,
+        "use_get": True,
+        "use_get_by_id": True,
+        "use_post": True,
+        "use_delete": False,
+        "use_patch": False,
+        "join_parameters": None,
+        "second_level_join_parameters": None,
+        "route_prefix": "/support-materials",
+        "route_tags": ["Support Materials"],
         "dependencies": True,
     },
 ]

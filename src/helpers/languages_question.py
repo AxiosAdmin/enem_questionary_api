@@ -5,7 +5,6 @@ from src.helpers.enem_question_common import (
     get_catalog_topics_with_subtopics,
 )
 
-
 LANGUAGES_TOPIC_CATALOG = {
     "Lingua Portuguesa": {
         "subtopics": [
@@ -249,6 +248,7 @@ def build_enem_languages_question_prompt(
     subtopic: str,
     subtopic_description: str,
     diversity_mode: str,
+    forced_question_assets: list | None = None,
 ) -> str:
     return build_enem_area_question_prompt(
         area_name="Linguagens, Codigos e suas Tecnologias",
@@ -259,5 +259,6 @@ def build_enem_languages_question_prompt(
         evaluation_points=LANGUAGES_EVALUATION_POINTS,
         frequent_contexts=LANGUAGES_FREQUENT_CONTEXTS,
         additional_area_guidelines=LANGUAGES_ADDITIONAL_GUIDELINES,
-        support_material_priorities=LANGUAGES_SUPPORT_MATERIAL_PRIORITIES,
+        question_asset_priorities=LANGUAGES_SUPPORT_MATERIAL_PRIORITIES,
+        forced_question_assets=forced_question_assets,
     )

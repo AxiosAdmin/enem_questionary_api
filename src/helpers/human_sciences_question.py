@@ -5,7 +5,6 @@ from src.helpers.enem_question_common import (
     get_catalog_topics_with_subtopics,
 )
 
-
 HUMAN_SCIENCES_TOPIC_CATALOG = {
     "Historia": {
         "subtopics": [
@@ -185,6 +184,7 @@ def build_enem_human_sciences_question_prompt(
     subtopic: str,
     subtopic_description: str,
     diversity_mode: str,
+    forced_question_assets: list | None = None,
 ) -> str:
     return build_enem_area_question_prompt(
         area_name="Ciencias Humanas e suas Tecnologias",
@@ -195,5 +195,6 @@ def build_enem_human_sciences_question_prompt(
         evaluation_points=HUMAN_SCIENCES_EVALUATION_POINTS,
         frequent_contexts=HUMAN_SCIENCES_FREQUENT_CONTEXTS,
         additional_area_guidelines=HUMAN_SCIENCES_ADDITIONAL_GUIDELINES,
-        support_material_priorities=HUMAN_SCIENCES_SUPPORT_MATERIAL_PRIORITIES,
+        question_asset_priorities=HUMAN_SCIENCES_SUPPORT_MATERIAL_PRIORITIES,
+        forced_question_assets=forced_question_assets,
     )

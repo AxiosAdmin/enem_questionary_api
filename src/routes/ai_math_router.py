@@ -4,7 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.configs.db_connection import get_db
 from src.controllers.ai_math_controller import AIMathController
 from src.schemas.ai_question_schema import GeneratedQuestionResponse
-from src.schemas.ai_math_schema import GenerateMathQuestionRequest, MathTopicsResponse
+from src.schemas.ai_math_schema import (
+    GenerateMathQuestionRequest,
+    GenerateMathQuestionWithSupportMaterialsRequest,
+    MathTopicsResponse,
+)
 
 ai_math_router = APIRouter()
 
@@ -20,3 +24,16 @@ async def generate_math_question(
     db: AsyncSession = Depends(get_db),
 ):
     return await AIMathController.generate_math_question(request, db)
+
+
+@ai_math_router.post(
+    "/math/with-support-materials",
+    response_model=GeneratedQuestionResponse,
+)
+async def generate_math_question_with_support_materials(
+    request: GenerateMathQuestionWithSupportMaterialsRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    return await AIMathController.generate_math_question_with_support_materials(
+        request, db
+    )

@@ -6,6 +6,7 @@ from src.controllers.ai_human_sciences_controller import AIHumanSciencesControll
 from src.schemas.ai_question_schema import GeneratedQuestionResponse
 from src.schemas.ai_human_sciences_schema import (
     GenerateHumanSciencesQuestionRequest,
+    GenerateHumanSciencesQuestionWithSupportMaterialsRequest,
     HumanSciencesTopicsResponse,
 )
 
@@ -27,3 +28,16 @@ async def generate_human_sciences_question(
     db: AsyncSession = Depends(get_db),
 ):
     return await AIHumanSciencesController.generate_human_sciences_question(request, db)
+
+
+@ai_human_sciences_router.post(
+    "/human-sciences/with-support-materials",
+    response_model=GeneratedQuestionResponse,
+)
+async def generate_human_sciences_question_with_support_materials(
+    request: GenerateHumanSciencesQuestionWithSupportMaterialsRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    return await AIHumanSciencesController.generate_human_sciences_question_with_support_materials(
+        request, db
+    )

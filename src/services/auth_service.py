@@ -85,9 +85,7 @@ class AuthService:
         }
 
     @staticmethod
-    async def forgot_password(
-        request: ForgotPasswordRequest, db: AsyncSession
-    ) -> dict:
+    async def forgot_password(request: ForgotPasswordRequest, db: AsyncSession) -> dict:
         email_hash = hash_lookup_value(request.email)
         result = await db.execute(select(Users).where(Users.email_hash == email_hash))
         user = result.scalar_one_or_none()

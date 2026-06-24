@@ -5,7 +5,6 @@ from src.helpers.enem_question_common import (
     get_catalog_topics_with_subtopics,
 )
 
-
 MATH_TOPIC_CATALOG = {
     "Numeros e operacoes": {
         "subtopics": [
@@ -285,6 +284,7 @@ def build_enem_math_question_prompt(
     subtopic: str,
     subtopic_description: str,
     diversity_mode: str,
+    forced_question_assets: list | None = None,
 ) -> str:
     return build_enem_area_question_prompt(
         area_name="Matematica e suas Tecnologias",
@@ -295,5 +295,6 @@ def build_enem_math_question_prompt(
         evaluation_points=MATH_EVALUATION_POINTS,
         frequent_contexts=MATH_FREQUENT_CONTEXTS,
         additional_area_guidelines=MATH_ADDITIONAL_GUIDELINES,
-        support_material_priorities=MATH_SUPPORT_MATERIAL_PRIORITIES,
+        question_asset_priorities=MATH_SUPPORT_MATERIAL_PRIORITIES,
+        forced_question_assets=forced_question_assets,
     )

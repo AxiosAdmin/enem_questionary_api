@@ -1,0 +1,19 @@
+[MASTER]
+init-hook=import os, sys; sys.path.insert(0, os.getcwd())
+
+[MESSAGES CONTROL]
+disable=
+    broad-exception-caught,
+    duplicate-code,
+    import-outside-toplevel,
+    line-too-long,
+    missing-class-docstring,
+    missing-function-docstring,
+    missing-module-docstring,
+    mixed-line-endings,
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-branches,
+    too-many-locals,
+    too-many-positional-arguments,
+    too-many-return-statements

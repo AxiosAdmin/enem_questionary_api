@@ -1,4 +1,6 @@
-from pydantic import BaseModel, field_validator
+from uuid import UUID
+
+from pydantic import BaseModel, Field, field_validator
 
 from src.helpers.human_sciences_question import get_human_sciences_topics
 
@@ -24,6 +26,12 @@ class GenerateHumanSciencesQuestionRequest(BaseModel):
                 f"Invalid topic. Supported topics are: {', '.join(get_human_sciences_topics())}"
             )
         return value
+
+
+class GenerateHumanSciencesQuestionWithSupportMaterialsRequest(
+    GenerateHumanSciencesQuestionRequest
+):
+    support_material_ids: list[UUID] = Field(min_length=1)
 
 
 class HumanSciencesTopicsResponse(BaseModel):

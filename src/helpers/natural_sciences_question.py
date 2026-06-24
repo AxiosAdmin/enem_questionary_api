@@ -5,7 +5,6 @@ from src.helpers.enem_question_common import (
     get_catalog_topics_with_subtopics,
 )
 
-
 NATURAL_SCIENCES_TOPIC_CATALOG = {
     "Fisica": {
         "subtopics": [
@@ -174,6 +173,7 @@ def build_enem_natural_sciences_question_prompt(
     subtopic: str,
     subtopic_description: str,
     diversity_mode: str,
+    forced_question_assets: list | None = None,
 ) -> str:
     return build_enem_area_question_prompt(
         area_name="Ciencias da Natureza e suas Tecnologias",
@@ -184,5 +184,6 @@ def build_enem_natural_sciences_question_prompt(
         evaluation_points=NATURAL_SCIENCES_EVALUATION_POINTS,
         frequent_contexts=NATURAL_SCIENCES_FREQUENT_CONTEXTS,
         additional_area_guidelines=NATURAL_SCIENCES_ADDITIONAL_GUIDELINES,
-        support_material_priorities=NATURAL_SCIENCES_SUPPORT_MATERIAL_PRIORITIES,
+        question_asset_priorities=NATURAL_SCIENCES_SUPPORT_MATERIAL_PRIORITIES,
+        forced_question_assets=forced_question_assets,
     )

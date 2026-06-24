@@ -3,12 +3,14 @@ from fastapi.security import HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 from api_crud_generate_libary.routers.router import Router
 
+from src.configs.configs import settings
 from src.routes import (
     ai_human_sciences_router,
     ai_languages_router,
     ai_math_router,
     ai_natural_sciences_router,
     auth_router,
+    question_router,
 )
 from src.models import routes
 from src.middlewares.auth_middleware import jwt_validation
@@ -19,7 +21,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.FRONTEND_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,6 +37,11 @@ def healthy():
 
 
 app.include_router(auth_router, tags=["Authentication"])
+app.include_router(
+    question_router,
+    tags=["Questions"],
+    dependencies=[Depends(security)],
+)
 
 for route in routes:
     item = Router(

@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
-class QuestionSupportMaterialResponse(BaseModel):
+class QuestionAssetResponse(BaseModel):
     id: UUID
     asset_type: str
     rendering_mode: str
@@ -43,7 +43,7 @@ class GeneratedQuestionResponse(BaseModel):
     explanation_e: str
     correct_answer: str
     created_at: datetime
-    support_materials: list[QuestionSupportMaterialResponse]
+    question_assets: list[QuestionAssetResponse]
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -67,7 +67,7 @@ class GeneratedQuestionResponse(BaseModel):
                 "explanation_e": "The solution is x = 6.",
                 "correct_answer": "2",
                 "created_at": "2023-01-01T00:00:00",
-                "support_materials": [],
+                "question_assets": [],
             }
         },
     )

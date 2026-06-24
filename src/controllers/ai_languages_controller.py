@@ -1,6 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas.ai_languages_schema import GenerateLanguagesQuestionRequest
+from src.schemas.ai_languages_schema import (
+    GenerateLanguagesQuestionRequest,
+    GenerateLanguagesQuestionWithSupportMaterialsRequest,
+)
 from src.services.ai_languages_service import AILanguagesService
 
 
@@ -15,3 +18,14 @@ class AILanguagesController:
         db: AsyncSession,
     ):
         return await AILanguagesService.generate_languages_question(request.topic, db)
+
+    @staticmethod
+    async def generate_languages_question_with_support_materials(
+        request: GenerateLanguagesQuestionWithSupportMaterialsRequest,
+        db: AsyncSession,
+    ):
+        return await AILanguagesService.generate_languages_question_with_support_materials(
+            request.topic,
+            request.support_material_ids,
+            db,
+        )

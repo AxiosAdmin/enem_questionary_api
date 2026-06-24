@@ -1,15 +1,17 @@
 import json
+from typing import Any
 
 from openai import OpenAI
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.helpers.enem_question_common import validate_generated_question_payload
 from src.models.models import Questions
 from src.services.question_asset_service import (
-    build_question_assets,
-    normalize_support_materials,
-    serialize_support_material,
+    get_question_assets_by_ids,
+    normalize_question_assets,
 )
+from src.services.question_service import QuestionService
 from src.configs.configs import settings
 
 client = OpenAI()
@@ -45,7 +47,7 @@ async def generate_enem_question(
             continue
 
         payload.update(selected_context)
-        support_materials = normalize_support_materials(payload["support_materials"])
+        question_assets = normalize_question_assets(payload["question_assets"])
         question = Questions(
             topic=payload["topic"],
             subtopic=payload["subtopic"],
@@ -64,43 +66,84 @@ async def generate_enem_question(
             explanation_e=payload["explanation_e"],
             correct_answer=payload["correct_answer"],
         )
-        db.add(question)
-        await db.flush()
-
-        assets = build_question_assets(question.id, support_materials)
-        for asset in assets:
-            db.add(asset)
-
-        await db.flush()
-        await db.commit()
-        await db.refresh(question)
-        return _serialize_generated_question(question, assets)
+        return await QuestionService.persist_question(
+            question=question,
+            question_assets=question_assets,
+            db=db,
+        )
 
     raise last_error or ValueError("Unable to generate a valid ENEM question.")
 
 
-def _serialize_generated_question(question: Questions, assets: list) -> dict:
-    return {
-        "id": question.id,
-        "topic": question.topic,
-        "subtopic": question.subtopic,
-        "subtopic_description": question.subtopic_description,
-        "diversity_mode": question.diversity_mode,
-        "question": question.question,
-        "answer_a": question.answer_a,
-        "answer_b": question.answer_b,
-        "answer_c": question.answer_c,
-        "answer_d": question.answer_d,
-        "answer_e": question.answer_e,
-        "explanation_a": question.explanation_a,
-        "explanation_b": question.explanation_b,
-        "explanation_c": question.explanation_c,
-        "explanation_d": question.explanation_d,
-        "explanation_e": question.explanation_e,
-        "correct_answer": question.correct_answer,
-        "created_at": question.created_at,
-        "support_materials": [
-            serialize_support_material(asset)
-            for asset in sorted(assets, key=lambda item: item.display_order)
-        ],
-    }
+async def generate_enem_question_with_support_materials(
+    topic: str,
+    support_material_ids: list,
+    build_context_fn,
+    build_prompt_fn,
+    db: AsyncSession,
+    *,
+    max_attempts: int = 4,
+) -> dict[str, Any]:
+    last_error = None
+    selected_context = build_context_fn(topic)
+    support_materials = await get_question_assets_by_ids(
+        asset_ids=support_material_ids,
+        db=db,
+    )
+
+    if not support_materials:
+        raise HTTPException(
+            status_code=400,
+            detail="At least one support material must be provided.",
+        )
+
+    for _ in range(max_attempts):
+        response = client.responses.create(
+            model=settings.OPENAI_TEXT_MODEL,
+            input=build_prompt_fn(
+                **selected_context,
+                forced_question_assets=support_materials,
+            ),
+        )
+        response_text = response.output[0].content[0].text
+
+        try:
+            payload = json.loads(response_text)
+        except json.JSONDecodeError:
+            last_error = ValueError("AI response is not a valid JSON object.")
+            continue
+
+        validation_error = validate_generated_question_payload(
+            payload,
+            require_question_assets=False,
+        )
+        if validation_error is not None:
+            last_error = ValueError(validation_error)
+            continue
+
+        payload.update(selected_context)
+        question = Questions(
+            topic=payload["topic"],
+            subtopic=payload["subtopic"],
+            subtopic_description=payload["subtopic_description"],
+            diversity_mode=payload["diversity_mode"],
+            question=payload["question"],
+            answer_a=payload["answer_a"],
+            answer_b=payload["answer_b"],
+            answer_c=payload["answer_c"],
+            answer_d=payload["answer_d"],
+            answer_e=payload["answer_e"],
+            explanation_a=payload["explanation_a"],
+            explanation_b=payload["explanation_b"],
+            explanation_c=payload["explanation_c"],
+            explanation_d=payload["explanation_d"],
+            explanation_e=payload["explanation_e"],
+            correct_answer=payload["correct_answer"],
+        )
+        return await QuestionService.persist_question_with_existing_assets(
+            question=question,
+            existing_assets=support_materials,
+            db=db,
+        )
+
+    raise last_error or ValueError("Unable to generate a valid ENEM question.")

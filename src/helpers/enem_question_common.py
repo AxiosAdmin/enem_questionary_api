@@ -1,8 +1,11 @@
+import json
 import re
 from random import choice
 
-from src.services.question_asset_service import validate_support_materials
-
+from src.services.question_asset_service import (
+    serialize_question_asset_for_prompt,
+    validate_question_assets,
+)
 
 REQUIRED_QUESTION_KEYS = {
     "topic",
@@ -21,7 +24,7 @@ REQUIRED_QUESTION_KEYS = {
     "explanation_d",
     "explanation_e",
     "correct_answer",
-    "support_materials",
+    "question_assets",
 }
 
 COMMON_ENEM_OBJECTIVE_QUESTION_GUIDELINES = [
@@ -88,7 +91,8 @@ def build_enem_area_question_prompt(
     evaluation_points: list[str],
     frequent_contexts: list[str],
     additional_area_guidelines: list[str],
-    support_material_priorities: list[str],
+    question_asset_priorities: list[str],
+    forced_question_assets: list | None = None,
 ) -> str:
     common_guidelines = "\n".join(
         f"- {guideline}" for guideline in COMMON_ENEM_OBJECTIVE_QUESTION_GUIDELINES
@@ -98,9 +102,59 @@ def build_enem_area_question_prompt(
     )
     area_evaluation_points = "\n".join(f"- {point}" for point in evaluation_points)
     area_contexts = "\n".join(f"- {context}" for context in frequent_contexts)
-    area_support_materials = "\n".join(
-        f"- {support_material}" for support_material in support_material_priorities
+    area_question_assets = "\n".join(
+        f"- {question_asset}" for question_asset in question_asset_priorities
     )
+    forced_assets_instruction = ""
+    required_question_keys = sorted(REQUIRED_QUESTION_KEYS)
+    response_structure_lines = [
+        f'  "{key}": "string",' for key in required_question_keys if key != "question_assets"
+    ]
+
+    if forced_question_assets:
+        serialized_forced_assets = json.dumps(
+            [
+                serialize_question_asset_for_prompt(asset)
+                for asset in forced_question_assets
+            ],
+            ensure_ascii=True,
+            indent=2,
+        )
+        forced_assets_instruction = f"""
+
+Materiais de suporte ja fornecidos pela aplicacao e que devem ser usados obrigatoriamente:
+{serialized_forced_assets}
+
+Regras obrigatorias para estes materiais fornecidos:
+- use esses materiais de suporte como base da resolucao da questao
+- faca referencia explicita aos materiais no enunciado
+- nao invente novos question_assets
+- nao altere, nao resuma e nao substitua os materiais fornecidos
+- como os materiais ja serao vinculados pela aplicacao, nao retorne o campo question_assets no JSON final
+""".rstrip()
+        required_question_keys = sorted(REQUIRED_QUESTION_KEYS.difference({"question_assets"}))
+        response_structure_lines = [
+            f'  "{key}": "A|B|C|D|E",' if key == "correct_answer" else f'  "{key}": "string",'
+            for key in required_question_keys
+        ]
+    else:
+        response_structure_lines = [
+            f'  "{key}": "A|B|C|D|E",' if key == "correct_answer" else f'  "{key}": "string",'
+            for key in sorted(REQUIRED_QUESTION_KEYS.difference({"question_assets"}))
+        ]
+        response_structure_lines.append('  "question_assets": [')
+        response_structure_lines.append("    {")
+        response_structure_lines.append(
+            '      "asset_type": "text|table|chart|diagram|image|map|infographic",'
+        )
+        response_structure_lines.append(
+            '      "rendering_mode": "inline_text|structured_data|generated_image",'
+        )
+        response_structure_lines.append(
+            '      "position": "before_statement|after_statement"'
+        )
+        response_structure_lines.append("    }")
+        response_structure_lines.append("  ]")
 
     return f"""
 Voce e um especialista em elaborar questoes originais da area {area_name} no estilo do ENEM.
@@ -128,7 +182,8 @@ Contextos frequentes e adequados para inspirar a questao:
 {area_contexts}
 
 Suportes multimodais mais adequados para esta area:
-{area_support_materials}
+{area_question_assets}
+{forced_assets_instruction}
 
 Requisitos gerais de qualidade:
 - a questao deve ter 5 alternativas objetivas: A, B, C, D e E
@@ -144,8 +199,8 @@ Requisitos gerais de qualidade:
 - construa distratores plausiveis e nao absurdos evidentes
 - nao gere uma questao cuja resposta correta dependa de informacao ausente
 - nao gere alternativas duplicadas ou indistinguiveis
-- retorne obrigatoriamente de 1 a 2 itens em support_materials
-- cada item de support_materials deve ser indispensavel para resolver a questao
+- retorne obrigatoriamente de 1 a 2 itens em question_assets quando a aplicacao nao tiver fornecido materiais prontos
+- cada item de question_assets deve ser indispensavel para resolver a questao quando esse campo for solicitado
 - o enunciado deve fazer referencia explicita ao suporte complementar quando ele existir
 - se usar texto-base, prefira trechos curtos ou medios e, quando pertinente, use rotulos como Texto I e Texto II
 - se usar material visual, descreva-o com clareza por meio de alt_text e legenda coerente
@@ -160,7 +215,7 @@ Preencha o conteudo com estes criterios:
 - answer_a ate answer_e: alternativas
 - explanation_a ate explanation_e: explique de forma curta por que cada alternativa esta correta ou incorreta
 - correct_answer: apenas uma letra entre A, B, C, D ou E
-- support_materials: lista com 1 ou 2 materiais de apoio essenciais, usando exclusivamente um dos formatos abaixo:
+- question_assets: lista com 1 ou 2 materiais de apoio essenciais, usando exclusivamente um dos formatos abaixo:
   1. texto de apoio:
      {{
        "asset_type": "text",
@@ -210,29 +265,7 @@ Regras adicionais para diagram:
 
 Retorne exclusivamente um JSON valido com esta estrutura:
 {{
-  "topic": "{topic}",
-  "subtopic": "{subtopic}",
-  "subtopic_description": "{subtopic_description}",
-  "diversity_mode": "{diversity_mode}",
-  "question": "string",
-  "answer_a": "string",
-  "answer_b": "string",
-  "answer_c": "string",
-  "answer_d": "string",
-  "answer_e": "string",
-  "explanation_a": "string",
-  "explanation_b": "string",
-  "explanation_c": "string",
-  "explanation_d": "string",
-  "explanation_e": "string",
-  "correct_answer": "A|B|C|D|E",
-  "support_materials": [
-    {{
-      "asset_type": "text|table|chart|diagram|image|map|infographic",
-      "rendering_mode": "inline_text|structured_data|generated_image",
-      "position": "before_statement|after_statement"
-    }}
-  ]
+{chr(10).join(response_structure_lines)}
 }}
 """.strip()
 
@@ -250,11 +283,20 @@ def question_is_too_short(question: str, minimum_word_count: int = 18) -> bool:
     return word_count < minimum_word_count
 
 
-def validate_generated_question_payload(payload: dict) -> str | None:
+def validate_generated_question_payload(
+    payload: dict,
+    *,
+    require_question_assets: bool = True,
+) -> str | None:
     if not isinstance(payload, dict):
         return "AI response is not a JSON object."
 
-    missing_keys = REQUIRED_QUESTION_KEYS.difference(payload.keys())
+    required_keys = (
+        REQUIRED_QUESTION_KEYS
+        if require_question_assets
+        else REQUIRED_QUESTION_KEYS.difference({"question_assets"})
+    )
+    missing_keys = required_keys.difference(payload.keys())
     if missing_keys:
         return f"AI response is missing required keys: {sorted(missing_keys)}"
 
@@ -282,10 +324,11 @@ def validate_generated_question_payload(payload: dict) -> str | None:
     if len(set(answer_fields.values())) != len(answer_fields):
         return "AI response returned duplicated answer alternatives."
 
-    support_materials_error = validate_support_materials(
-        payload.get("support_materials")
-    )
-    if support_materials_error is not None:
-        return support_materials_error
+    if require_question_assets:
+        question_assets_error = validate_question_assets(
+            payload.get("question_assets")
+        )
+        if question_assets_error is not None:
+            return question_assets_error
 
     return None

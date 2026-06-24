@@ -20,18 +20,30 @@ docker compose up --build
 
 ## Questoes multimodais e S3
 
+Agora existe tambem uma rota manual autenticada `POST /questions` para salvar a
+questao junto com `question_assets`.
+
+Agora existe tambem a rota autenticada `GET /support-materials`, que lista os
+registros de `question_assets` usando a biblioteca generica configurada em
+`src/models/__init__.py`.
+
+Os materiais manuais aceitos sao:
+
+- `text` com `rendering_mode=inline_text` e `content`
+- `table`, `chart` e `diagram` com `rendering_mode=structured_data` e `data`
+- `image`, `map` e `infographic` com `rendering_mode=generated_image` usando
+  exatamente uma das opcoes abaixo:
+  `image_generation_prompt`, `public_url` ou `file_base64`
+
+Para upload direto de imagem pelo front, envie `file_base64` e `mime_type`.
+Quando a imagem ja estiver hospedada, envie `public_url`.
+
 As rotas de geracao de questoes agora persistem a questao no banco e retornam
-`support_materials` no payload. Os materiais de apoio podem ser:
+`question_assets` no payload. Os materiais de apoio podem ser:
 
 - `text` com `inline_text`
 - `table` e `chart` com `structured_data`
 - `image`, `map`, `diagram` e `infographic` com `generated_image`
-
-Para bancos ja existentes, execute a migration:
-
-```powershell
-psql -h <host> -U <user> -d <database> -f src/databases/scripts/1.1_add_question_assets.sql
-```
 
 Variaveis novas de ambiente:
 

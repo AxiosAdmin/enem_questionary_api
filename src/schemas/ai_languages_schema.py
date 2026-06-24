@@ -1,4 +1,6 @@
-from pydantic import BaseModel, field_validator
+from uuid import UUID
+
+from pydantic import BaseModel, Field, field_validator
 
 from src.helpers.languages_question import get_languages_topics
 
@@ -24,6 +26,12 @@ class GenerateLanguagesQuestionRequest(BaseModel):
                 f"Invalid topic. Supported topics are: {', '.join(get_languages_topics())}"
             )
         return value
+
+
+class GenerateLanguagesQuestionWithSupportMaterialsRequest(
+    GenerateLanguagesQuestionRequest
+):
+    support_material_ids: list[UUID] = Field(min_length=1)
 
 
 class LanguagesTopicsResponse(BaseModel):

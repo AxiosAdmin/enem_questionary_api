@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.configs.configs import settings
 from src.configs.db_connection import async_session
 from src.helpers.constraints import BYPASS_ROUTES
 from src.models.models import Users
@@ -15,6 +16,18 @@ from src.utils.jwt_utils import decode_token
 def should_bypass_auth(method: str, path: str) -> bool:
     normalized_path = path.rstrip("/") or "/"
     return method == "OPTIONS" or normalized_path in BYPASS_ROUTES
+
+
+def build_auth_error_response(
+    request: Request, status_code: int, detail: str
+) -> JSONResponse:
+    response = JSONResponse(status_code=status_code, content={"detail": detail})
+    origin = request.headers.get("origin")
+    if origin and origin in settings.FRONTEND_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Vary"] = "Origin"
+    return response
 
 
 async def validate_token_user(user_id: str, db: AsyncSession) -> None:
@@ -35,16 +48,14 @@ async def jwt_validation(request: Request, call_next):
 
     authorization = request.headers.get("authorization")
     if not authorization:
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Authorization header is required"},
+        return build_auth_error_response(
+            request, 401, "Authorization header is required"
         )
 
     scheme, _, token = authorization.partition(" ")
     if scheme.lower() != "bearer" or not token:
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Invalid authorization format. Use: Bearer <token>"},
+        return build_auth_error_response(
+            request, 401, "Invalid authorization format. Use: Bearer <token>"
         )
 
     try:
@@ -60,10 +71,10 @@ async def jwt_validation(request: Request, call_next):
         request.state.user_id = user_id
 
     except jwt.ExpiredSignatureError:
-        return JSONResponse(status_code=401, content={"detail": "Token expired"})
+        return build_auth_error_response(request, 401, "Token expired")
     except (jwt.InvalidTokenError, HTTPException) as exc:
         status_code = getattr(exc, "status_code", 401)
         detail = getattr(exc, "detail", "Invalid token")
-        return JSONResponse(status_code=status_code, content={"detail": detail})
+        return build_auth_error_response(request, status_code, detail)
 
     return await call_next(request)

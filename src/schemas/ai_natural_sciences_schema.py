@@ -1,4 +1,6 @@
-from pydantic import BaseModel, field_validator
+from uuid import UUID
+
+from pydantic import BaseModel, Field, field_validator
 
 from src.helpers.natural_sciences_question import get_natural_sciences_topics
 
@@ -25,6 +27,12 @@ class GenerateNaturalSciencesQuestionRequest(BaseModel):
                 f"{', '.join(get_natural_sciences_topics())}"
             )
         return value
+
+
+class GenerateNaturalSciencesQuestionWithSupportMaterialsRequest(
+    GenerateNaturalSciencesQuestionRequest
+):
+    support_material_ids: list[UUID] = Field(min_length=1)
 
 
 class NaturalSciencesTopicsResponse(BaseModel):

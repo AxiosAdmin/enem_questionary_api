@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import secrets
 
-
 PBKDF2_ITERATIONS = 390000
 
 
@@ -14,10 +13,7 @@ def hash_password(password: str) -> str:
         bytes.fromhex(salt),
         PBKDF2_ITERATIONS,
     )
-    return (
-        f"pbkdf2_sha256${PBKDF2_ITERATIONS}$"
-        f"{salt}${derived_key.hex()}"
-    )
+    return f"pbkdf2_sha256${PBKDF2_ITERATIONS}$" f"{salt}${derived_key.hex()}"
 
 
 def verify_password(password: str, password_hash: str) -> bool:

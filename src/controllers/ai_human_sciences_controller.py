@@ -1,6 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas.ai_human_sciences_schema import GenerateHumanSciencesQuestionRequest
+from src.schemas.ai_human_sciences_schema import (
+    GenerateHumanSciencesQuestionRequest,
+    GenerateHumanSciencesQuestionWithSupportMaterialsRequest,
+)
 from src.services.ai_human_sciences_service import AIHumanSciencesService
 
 
@@ -18,4 +21,15 @@ class AIHumanSciencesController:
     ):
         return await AIHumanSciencesService.generate_human_sciences_question(
             request.topic, db
+        )
+
+    @staticmethod
+    async def generate_human_sciences_question_with_support_materials(
+        request: GenerateHumanSciencesQuestionWithSupportMaterialsRequest,
+        db: AsyncSession,
+    ):
+        return await AIHumanSciencesService.generate_human_sciences_question_with_support_materials(
+            request.topic,
+            request.support_material_ids,
+            db,
         )

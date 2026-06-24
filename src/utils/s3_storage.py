@@ -23,7 +23,22 @@ class S3Storage:
     @staticmethod
     def upload_question_asset(
         *,
-        question_id: uuid.UUID,
+        owner_id: uuid.UUID,
+        extension: str,
+        body: bytes,
+        content_type: str,
+    ) -> dict[str, str]:
+        return S3Storage._upload_asset(
+            object_owner_prefix=str(owner_id),
+            extension=extension,
+            body=body,
+            content_type=content_type,
+        )
+
+    @staticmethod
+    def _upload_asset(
+        *,
+        object_owner_prefix: str,
         extension: str,
         body: bytes,
         content_type: str,
@@ -33,9 +48,9 @@ class S3Storage:
 
         key_prefix = settings.S3_KEY_PREFIX.strip("/")
         object_key = (
-            f"{key_prefix}/{question_id}/{uuid.uuid4()}.{extension.lstrip('.')}"
+            f"{key_prefix}/{object_owner_prefix}/{uuid.uuid4()}.{extension.lstrip('.')}"
             if key_prefix
-            else f"{question_id}/{uuid.uuid4()}.{extension.lstrip('.')}"
+            else f"{object_owner_prefix}/{uuid.uuid4()}.{extension.lstrip('.')}"
         )
 
         client = boto3.client(
@@ -69,10 +84,7 @@ class S3Storage:
             return f"{public_base_url.rstrip('/')}/{encoded_key}"
 
         if endpoint_url:
-            return (
-                f"{endpoint_url.rstrip('/')}/"
-                f"{settings.S3_BUCKET}/{encoded_key}"
-            )
+            return f"{endpoint_url.rstrip('/')}/" f"{settings.S3_BUCKET}/{encoded_key}"
 
         if settings.S3_REGION:
             return (
