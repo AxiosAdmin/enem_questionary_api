@@ -1,3 +1,10 @@
+## v0.4.0
+
+- Manual questions route added
+- Support materials routes added
+- Questions generation using support material routes added
+- Database update added
+
 ## v0.3.0
 
 - Manual question creation added 
