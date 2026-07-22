@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     S3_PUBLIC_BASE_URL: str | None = None
     S3_KEY_PREFIX: str = "question-assets"
 
-    FRONTEND_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    FRONTEND_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "https://enemquestionaryfront-production.up.railway.app"]
 
     @field_validator("FRONTEND_ORIGINS", mode="before")
     @classmethod
